@@ -1,0 +1,91 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Set a background color for the entire page */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    background-color: #bad3ee
+}
+
+/* Style the header section */
+header {
+    /* background-color: #007bff; */
+    background: linear-gradient(145deg, #08023a 10%,#068A5E, #0fb7dd 85%);
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Style the heading */
+h1 {
+    font-size: 24px;
+}
+
+/* Style the helpline boxes */
+.helpline {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 20px;
+    padding: 15px;
+}
+
+/* Style the helpline headings */
+.helpline h2 {
+    color: #007bff;
+    font-size: 20px;
+}
+
+/* Style the helpline phone numbers */
+.helpline p {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* Style the Emergency Contact box */
+.emergency-contact {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 20px;
+    padding: 15px;
+}
+
+/* Style the Emergency Contact heading */
+.emergency-contact h2 {
+    color: #007bff;
+    font-size: 20px;
+}
+
+/* Style the Emergency Contact email */
+.emergency-contact p {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* Style the footer */
+footer {
+    text-align: center;
+    padding: 10px;
+    /* background-color: #007bff; */
+    background: linear-gradient(145deg, #08023a 10%,#068A5E, #0fb7dd 85%);
+    color: #fff;
+}
+
+/* Style links in the footer */
+footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Change link color on hover */
+footer a:hover {
+    text-decoration: underline;
+}

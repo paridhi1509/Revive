@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>REVIVE</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh; 
+            margin: 0; 
+            background: linear-gradient(120deg, #08023a 10%,#068A5E, #0fb7dd 85%);
+        }
+
+        h1 {
+            font-size: 35px;
+            margin-bottom: 150px; 
+        }
+
+        .menu-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .menu-item {
+            width: 200px;
+            height: 200px;
+            background-color: #fff;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor:pointer;
+            transition:background-color 0.3s, transform 0.3s;
+        }
+        .menu-item:hover {
+            background-color: #f5f5f5; 
+            transform: scale(1.1); 
+        }
+
+        .menu-item-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .menu-item-label {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>--MENU--</h1>
+    <div class="menu-container">
+       
+        <a href="sc1.html" class="menu-item">
+            <span class="menu-item-icon">🧘‍♂️</span>
+            <span class="menu-item-label">Self Care</span>
+        </a>
+        <a href="moodttracker.html" class="menu-item">
+            <span class="menu-item-icon">😄</span>
+            <span class="menu-item-label">Mood Tracker</span>
+        </a>
+        <a href="chatbot.html" class="menu-item">
+            <span class="menu-item-icon">🤖</span>
+            <span class="menu-item-label">Chatbot</span>
+        </a>
+        <a href="or.html" class="menu-item">
+            <span class="menu-item-icon">🌟</span>
+            <span class="menu-item-label">Other Resources</span>
+        </a>
+    </div>
+    
+</body>
+</html>
