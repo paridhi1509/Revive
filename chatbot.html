@@ -1,27 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>REVIVE</title>
-  <link rel="stylesheet" href="chatbot.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REVIVE — Wellbeing Chat</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--bg-light); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+    .chat-wrapper {
+      flex: 1; display: flex; flex-direction: column;
+      max-width: 780px; width: 100%; margin: 0 auto;
+      height: calc(100vh - 49px);
+    }
+
+    .chat-header {
+      padding: 0.6rem 1rem;
+      background: white; border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .chat-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .chat-header-info h2 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; }
+    .chat-status { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text-light); }
+    .chat-status::before { content: ''; width: 6px; height: 6px; background: #34D399; border-radius: 50%; }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 0.85rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+
+    .message { max-width: 78%; animation: fadeInUp 0.25s ease forwards; }
+    .message-bot { align-self: flex-start; }
+    .message-user { align-self: flex-end; }
+
+    .message-bubble {
+      padding: 0.6rem 0.9rem; border-radius: var(--radius-md);
+      font-size: 0.85rem; line-height: 1.55; word-wrap: break-word;
+    }
+    .message-bot .message-bubble {
+      background: white; color: var(--text-dark);
+      border: 1px solid var(--border-subtle);
+      border-bottom-left-radius: 3px; box-shadow: var(--shadow-sm);
+    }
+    .message-user .message-bubble {
+      background: var(--slate-blue); color: white;
+      border-bottom-right-radius: 3px;
+    }
+    .message-time { font-size: 0.62rem; color: var(--text-light); margin-top: 2px; padding: 0 3px; }
+    .message-user .message-time { text-align: right; }
+
+    .typing-indicator {
+      display: none; align-self: flex-start;
+      padding: 0.6rem 0.9rem; background: white;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); border-bottom-left-radius: 3px;
+      box-shadow: var(--shadow-sm);
+    }
+    .typing-indicator.show { display: flex; gap: 3px; align-items: center; }
+    .typing-dot { width: 6px; height: 6px; background: var(--periwinkle); border-radius: 50%; animation: typingDot 1.4s ease-in-out infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    .quick-replies {
+      padding: 0.3rem 0.85rem;
+      display: flex; gap: 0.35rem; flex-wrap: wrap; overflow-x: auto;
+    }
+    .quick-reply {
+      padding: 0.3rem 0.7rem; background: white;
+      border: 1.5px solid var(--periwinkle); border-radius: var(--radius-xl);
+      font-size: 0.72rem; font-weight: 500; color: var(--slate-blue);
+      cursor: pointer; white-space: nowrap; transition: all 0.3s ease;
+      font-family: var(--font-body);
+    }
+    .quick-reply:hover { background: var(--periwinkle); color: var(--text-dark); }
+
+    .chat-input-area {
+      padding: 0.5rem 0.85rem;
+      background: white; border-top: 1px solid var(--border-subtle);
+      display: flex; gap: 0.4rem; align-items: center;
+    }
+    .chat-input-area input {
+      flex: 1; padding: 0.6rem 0.85rem;
+      border: 1.5px solid var(--border-subtle); border-radius: var(--radius-xl);
+      font-family: var(--font-body); font-size: 0.85rem;
+      outline: none; transition: border-color 0.3s; background: var(--bg-light);
+    }
+    .chat-input-area input:focus { border-color: var(--muted-teal); background: white; }
+
+    .send-btn {
+      width: 38px; height: 38px; border-radius: 50%; border: none;
+      background: var(--gradient-primary); color: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease; flex-shrink: 0;
+    }
+    .send-btn:hover { transform: scale(1.06); box-shadow: 0 3px 10px rgba(91,109,138,0.35); }
+    .send-btn svg { width: 16px; height: 16px; }
+
+    @media (max-width: 768px) {
+      .message { max-width: 88%; }
+      .chat-input-area { padding: 0.4rem 0.6rem; }
+      .quick-replies { padding: 0.3rem 0.6rem; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="chatbot">
-      <div class="chatbot-header">
-        <h1>Mental Well-Being Chat Bot</h1>
+  <nav class="nav-bar">
+    <a href="Menu1.html" class="nav-logo"><img src="revive.png" alt="Revive"><span>Revive</span></a>
+    <button class="nav-hamburger" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="Menu1.html">Dashboard</a></li>
+      <li><a href="moodttracker.html">Mood Tracker</a></li>
+      <li><a href="chatbot.html" class="active">Chat</a></li>
+      <li><a href="sc1.html">Self Care</a></li>
+      <li><a href="or.html">Resources</a></li>
+    </ul>
+  </nav>
+
+  <div class="chat-wrapper">
+    <div class="chat-header">
+      <div class="chat-avatar">🤖</div>
+      <div class="chat-header-info">
+        <h2>Revive Assistant</h2>
+        <div class="chat-status">Online — here to listen</div>
       </div>
-      <div class="chatbot-body">
-        <div class="chatbot-messages" id="chatbot-messages">
-          <!-- Chatbot messages go here -->
-        </div>
-        <div class="chatbot-input">
-          <input type="text" id="user-input" placeholder="Type your message...">
-          <button onclick="sendMessage()">Send</button>
-        </div>
-      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages"></div>
+
+    <div class="typing-indicator" id="typing-indicator">
+      <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+    </div>
+
+    <div class="quick-replies" id="quick-replies">
+      <button class="quick-reply" data-msg="I'm feeling stressed">😰 Stressed</button>
+      <button class="quick-reply" data-msg="I need help with anxiety">😟 Anxiety</button>
+      <button class="quick-reply" data-msg="suggest some breathing exercises">🧘 Breathing</button>
+      <button class="quick-reply" data-msg="I'm feeling lonely">💙 Lonely</button>
+      <button class="quick-reply" data-msg="self care practices">🌿 Self care</button>
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
+      <button class="send-btn" id="send-btn" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
     </div>
   </div>
 
   <script src="chatbot.js"></script>
+  <script>document.getElementById('nav-toggle').addEventListener('click',()=>{document.getElementById('nav-links').classList.toggle('open')});</script>
 </body>
 </html>

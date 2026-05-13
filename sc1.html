@@ -1,73 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REVIVE</title>
-    <link rel="stylesheet" href="sc1.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REVIVE — Self Care</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--bg-light); }
+
+    .sc-hero {
+      background: var(--gradient-hero);
+      padding: 1.25rem 0;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .sc-hero h1 { color: white; font-size: 1.3rem; margin-bottom: 0.15rem; }
+    .sc-hero p { color: rgba(255,255,255,0.75); font-size: 0.82rem; max-width: 450px; margin: 0 auto; }
+
+    .breathing-section { padding: 1.5rem 0 1rem; text-align: center; }
+    .breathing-section h2 { font-size: 1.15rem; margin-bottom: 0.3rem; }
+    .breathing-section > .container > p { font-size: 0.82rem; }
+
+    .breath-circle-container { position: relative; width: 160px; height: 160px; margin: 1rem auto; }
+    .breath-circle {
+      width: 160px; height: 160px; border-radius: 50%;
+      background: var(--gradient-soft);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
+      box-shadow: 0 0 25px rgba(122,158,155,0.15);
+    }
+    .breath-circle.inhale { transform: scale(1.35); box-shadow: 0 0 40px rgba(122,158,155,0.3); }
+    .breath-circle.hold { transform: scale(1.35); box-shadow: 0 0 35px rgba(122,158,155,0.25); transition: none; }
+    .breath-circle.exhale { transform: scale(1); transition: transform 6s ease-in-out, box-shadow 6s ease-in-out; }
+    .breath-text { font-family: var(--font-heading); font-size: 1rem; color: var(--slate-blue); font-weight: 600; }
+
+    .breath-controls { display: flex; gap: 0.6rem; justify-content: center; margin-top: 0.75rem; }
+    .breath-timer { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+    .info-section { padding: 0.5rem 0 1.25rem; }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+
+    .info-card {
+      background: white; border-radius: var(--radius-md);
+      padding: 0.85rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s ease;
+    }
+    .info-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .info-card h3 { font-family: var(--font-body); font-size: 0.88rem; font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.3rem; }
+
+    .info-card ul { list-style: none; padding: 0; }
+    .info-card li {
+      padding: 0.2rem 0; font-size: 0.78rem; color: var(--text-muted);
+      display: flex; align-items: flex-start; gap: 0.3rem; line-height: 1.4;
+    }
+    .info-card li::before { content: '•'; color: var(--muted-teal); font-weight: bold; flex-shrink: 0; }
+    .info-card ol { padding-left: 1rem; }
+    .info-card ol li { display: list-item; padding: 0.15rem 0; font-size: 0.78rem; color: var(--text-muted); }
+    .info-card ol li::before { display: none; }
+
+    .music-section { padding: 0.25rem 0 1.5rem; }
+    .music-section h2 { text-align: center; margin-bottom: 0.75rem; font-size: 1.1rem; }
+    .music-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+
+    .music-card {
+      background: white; border-radius: var(--radius-sm);
+      padding: 0.75rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+      display: flex; align-items: center; gap: 0.6rem;
+      transition: all 0.3s ease;
+    }
+    .music-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--muted-teal); }
+    .music-icon {
+      width: 38px; height: 38px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .music-card:first-child .music-icon { background: rgba(222,196,173,0.25); }
+    .music-card:last-child .music-icon { background: rgba(196,212,232,0.35); }
+    .music-card h4 { font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; }
+    .music-card p { font-size: 0.72rem; }
+
+    @media (max-width: 768px) {
+      .info-grid, .music-grid { grid-template-columns: 1fr; }
+      .breath-circle-container { width: 130px; height: 130px; }
+      .breath-circle { width: 130px; height: 130px; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Practice Mindfulness</h1>
-    </header>
+  <nav class="nav-bar">
+    <a href="Menu1.html" class="nav-logo"><img src="revive.png" alt="Revive"><span>Revive</span></a>
+    <button class="nav-hamburger" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="Menu1.html">Dashboard</a></li>
+      <li><a href="moodttracker.html">Mood Tracker</a></li>
+      <li><a href="chatbot.html">Chat</a></li>
+      <li><a href="sc1.html" class="active">Self Care</a></li>
+      <li><a href="or.html">Resources</a></li>
+    </ul>
+  </nav>
 
-    <main>
-        <section class="instruction">
-            <h2>Guided Breathing Exercise</h2>
-            <p>Take a moment to practice mindfulness through controlled breathing. This exercise can help reduce stress and improve focus.</p>
-        </section>
+  <section class="sc-hero">
+    <div class="container"><h1>Practice Mindfulness 🧘</h1><p>Take a moment to breathe, relax, and reconnect with yourself.</p></div>
+  </section>
 
-        <section class="steps">
-            <h3>Instructions:</h3>
-            <ol>
-                <li>Find a quiet and comfortable place to sit or lie down.</li>
-                <li>Close your eyes and take a deep breath in through your nose, counting to four as you inhale.</li>
-                <li>Hold your breath for a count of four.</li>
-                <li>Exhale slowly through your mouth for a count of six.</li>
-                <li>Repeat this cycle for several breaths, focusing on the sensation of your breath and the counting.</li>
-            </ol>
-        </section>
+  <section class="breathing-section">
+    <div class="container container-sm">
+      <h2>Guided Breathing Exercise</h2>
+      <p>Follow the circle — inhale, hold, exhale.</p>
+      <div class="breath-circle-container">
+        <div class="breath-circle" id="breath-circle"><span class="breath-text" id="breath-text">Press Start</span></div>
+      </div>
+      <div class="breath-timer" id="breath-timer">4-7-8 Technique</div>
+      <div class="breath-controls">
+        <button class="btn btn-primary" id="breath-start">▶ Start</button>
+        <button class="btn btn-secondary" id="breath-stop" disabled>■ Stop</button>
+      </div>
+    </div>
+  </section>
 
-        <section class="tips">
-            <h3>Tips:</h3>
-            <ul>
-                <li>Practice this exercise for at least 5-10 minutes.</li>
-                <li>If your mind starts to wander, gently bring your focus back to your breath and the counting.</li>
-                <li>Use this exercise whenever you need to relax, regain focus, or reduce stress.</li>
-            </ul>
-        </section>
+  <section class="info-section">
+    <div class="container">
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>📋 Instructions</h3>
+          <ol>
+            <li>Find a quiet, comfortable place.</li>
+            <li>Inhale through nose for 4 counts.</li>
+            <li>Hold for 7 counts.</li>
+            <li>Exhale through mouth for 8 counts.</li>
+            <li>Repeat for several cycles.</li>
+          </ol>
+        </div>
+        <div class="info-card">
+          <h3>💡 Tips</h3>
+          <ul>
+            <li>Practice for 5-10 minutes.</li>
+            <li>Gently refocus if mind wanders.</li>
+            <li>Use whenever you feel stressed.</li>
+            <li>Same time daily builds habit.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>✨ Benefits</h3>
+          <ul>
+            <li>Reduces stress and anxiety.</li>
+            <li>Enhances concentration.</li>
+            <li>Promotes calm and relaxation.</li>
+            <li>Improves emotional resilience.</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>⏰ When to Practice</h3>
+          <ul>
+            <li>Morning for focus.</li>
+            <li>Work/study breaks to refresh.</li>
+            <li>Before bed for better sleep.</li>
+            <li>Anytime you're overwhelmed.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <section class="benefits">
-            <h3>Benefits of Mindful Breathing:</h3>
-            <ul>
-                <li>Reduces stress and anxiety.</li>
-                <li>Enhances concentration and mental clarity.</li>
-                <li>Promotes relaxation and a sense of calm.</li>
-                <li>Improves emotional well-being and resilience.</li>
-                <li>Can help lower blood pressure and heart rate.</li>
-            </ul>
-        </section>
+  <section class="music-section">
+    <div class="container container-sm">
+      <h2>🎵 Calming Music</h2>
+      <div class="music-grid">
+        <a href="https://youtu.be/wdturEfdkUs?si=ohA2Pc1dv13qUAwp" target="_blank" rel="noopener" class="music-card">
+          <div class="music-icon">🎶</div>
+          <div><h4>Relaxing Music — YouTube</h4><p>Soothing sounds for relaxation</p></div>
+        </a>
+        <a href="https://open.spotify.com/episode/7oLzGgvkeETiH7a9vWiZcT" target="_blank" rel="noopener" class="music-card">
+          <div class="music-icon">🎧</div>
+          <div><h4>Calming Playlists — Spotify</h4><p>Curated for mindfulness</p></div>
+        </a>
+      </div>
+    </div>
+  </section>
 
-        <section class="when-to-practice">
-            <h3>When to Practice:</h3>
-            <p>You can practice this breathing exercise:</p>
-            <ul>
-                <li>In the morning to start your day with focus.</li>
-                <li>During work or study breaks to refresh your mind.</li>
-                <li>Before bedtime to unwind and improve sleep quality.</li>
-                <li>Anytime you feel overwhelmed or stressed.</li>
-            </ul>
-        </section>
-        <section class="music-links">
-            <h3>Calming Music:</h3>
-            <ul>
-                <li><a href="https://youtu.be/wdturEfdkUs?si=ohA2Pc1dv13qUAwp" target="_blank">Relaxing Music on YouTube</a></li>
-                <li><a href="https://open.spotify.com/episode/7oLzGgvkeETiH7a9vWiZcT?si=t_g8J_yYSLGkNk_ZObNGGw" target="_blank">Calming Playlists on Spotify</a></li>
-              
-            </ul>
-        </section>
-    </main>
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click',()=>{document.getElementById('nav-links').classList.toggle('open')});
 
+    const circle = document.getElementById('breath-circle');
+    const text = document.getElementById('breath-text');
+    const timer = document.getElementById('breath-timer');
+    const startBtn = document.getElementById('breath-start');
+    const stopBtn = document.getElementById('breath-stop');
+    let breathInterval = null, breathPhase = 0, cycleCount = 0;
+
+    function runBreathCycle() {
+      const phases = [
+        { name: 'Inhale...', cls: 'inhale', duration: 4000 },
+        { name: 'Hold...', cls: 'hold', duration: 7000 },
+        { name: 'Exhale...', cls: 'exhale', duration: 8000 },
+      ];
+      let p = phases[breathPhase % 3];
+      if (breathPhase % 3 === 0) cycleCount++;
+      circle.className = 'breath-circle ' + p.cls;
+      text.textContent = p.name;
+      timer.textContent = `Cycle ${cycleCount} — ${p.name}`;
+      breathPhase++;
+      breathInterval = setTimeout(runBreathCycle, p.duration);
+    }
+
+    startBtn.addEventListener('click', () => {
+      breathPhase = 0; cycleCount = 0;
+      startBtn.disabled = true; stopBtn.disabled = false;
+      runBreathCycle();
+    });
+    stopBtn.addEventListener('click', () => {
+      clearTimeout(breathInterval);
+      circle.className = 'breath-circle'; text.textContent = 'Press Start';
+      timer.textContent = '4-7-8 Technique';
+      startBtn.disabled = false; stopBtn.disabled = true;
+    });
+  </script>
 </body>
 </html>
-

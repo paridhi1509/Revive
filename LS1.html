@@ -1,70 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>REVIVE</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REVIVE — Login</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin: 0; overflow: hidden; }
 
-    <link rel="stylesheet" href="LS1.css" />
-  </head>
+    .login-page {
+      height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--gradient-hero);
+      position: relative; overflow: hidden;
+    }
 
-  <body>
-    <main id="main-holder">
-      <h1 id="login-header">Login</h1>
-      <div id="login-error-msg-holder">
-        <p id="login-error-msg">
-          Invalid username
-          <span id="error-msg-second-line">and/or password</span>
-        </p>
+    .login-page .orb { position: absolute; border-radius: 50%; opacity: 0.1; pointer-events: none; }
+    .login-page .orb-1 { width: 300px; height: 300px; background: var(--warm-peach); top: -100px; right: -80px; animation: float 8s ease-in-out infinite; }
+    .login-page .orb-2 { width: 220px; height: 220px; background: var(--periwinkle); bottom: -60px; left: -60px; animation: float 10s ease-in-out infinite reverse; }
+
+    .login-card {
+      width: 100%; max-width: 380px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 1.5rem 1.5rem 1.25rem;
+      position: relative; z-index: 2;
+      animation: scaleIn 0.5s ease forwards;
+    }
+
+    .login-header { text-align: center; margin-bottom: 1rem; }
+    .login-header img { width: 50px; height: 50px; border-radius: 50%; margin-bottom: 0.5rem; box-shadow: var(--shadow-sm); }
+    .login-header h1 { font-size: 1.3rem; margin-bottom: 0.15rem; }
+    .login-header p { font-size: 0.82rem; }
+
+    .login-error {
+      background: #FEE2E2; border: 1px solid #FECACA; color: #DC2626;
+      font-size: 0.8rem; font-weight: 500;
+      padding: 0.4rem 0.75rem; border-radius: var(--radius-sm);
+      text-align: center; margin-bottom: 0.75rem; display: none;
+    }
+    .login-error.show { display: block; animation: shake 0.4s ease; }
+
+    .login-form .form-group { margin-bottom: 0.85rem; }
+
+    .login-actions { display: flex; flex-direction: column; gap: 0.6rem; }
+    .login-actions .btn { width: 100%; padding: 0.65rem; }
+
+    .divider {
+      display: flex; align-items: center; gap: 0.75rem;
+      color: var(--text-light); font-size: 0.75rem; margin: 0.15rem 0;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }
+
+    .back-home { display: block; text-align: center; margin-top: 0.85rem; font-size: 0.8rem; color: var(--text-muted); }
+    .back-home a { color: var(--muted-teal); font-weight: 600; }
+    .back-home a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="login-card">
+      <div class="login-header">
+        <img src="revive.png" alt="Revive">
+        <h1>Welcome Back</h1>
+        <p>Sign in to continue your wellness journey</p>
       </div>
-
-      <form id="login-form">
-        <input
-          type="text"
-          name="username"
-          id="username-field"
-          class="login-form-field"
-          placeholder="Username"
-        />
-        <input
-          type="password"
-          name="password"
-          id="password-field"
-          class="login-form-field"
-          placeholder="Password"
-        />
-        <input type="submit" value="Login" id="login-form-submit" />
+      <div class="login-error" id="login-error">Invalid username or password.</div>
+      <form class="login-form" id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="username-field">Username</label>
+          <input type="text" id="username-field" class="form-input" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password-field">Password</label>
+          <input type="password" id="password-field" class="form-input" placeholder="Enter your password" required>
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="btn btn-primary">Sign In</button>
+          <div class="divider">or</div>
+          <a href="Menu1.html" class="btn btn-secondary">Continue as Guest</a>
+        </div>
       </form>
-    </main>
-
-    <script>
-      const loginForm = document.getElementById("login-form");
-      const loginButton = document.getElementById("login-form-submit");
-      const loginErrorMsg = document.getElementById("login-error-msg");
-
-      loginButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        const username = loginForm.username.value;
-        const password = loginForm.password.value;
-
-        if (username == "admin" && password == "user123") {
-          window.location.href = "menu1.html";
-        } 
-        else if(username=="paridhi_jain" && password=="paridhhii"){
-          window.location.href="menu1.html";
-        }
-        else if(username=="varshney_palak"&& password=="varshney"){
-          window.location.href="menu1.html";
-        }
-        else if(username=="khushi_rathi"&& password=="khhushii"){
-          window.location.href="menu1.html";
-        }
-         {
-          loginErrorMsg.style.opacity = 1;
-        }
-      });
-    </script>
-  </body>
-
+      <p class="back-home"><a href="opening.html">← Back to home</a></p>
+    </div>
+  </div>
+  <script>
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const validUsers = [
+      { username: 'admin', password: 'user123' },
+      { username: 'paridhi_jain', password: 'paridhhii' },
+      { username: 'varshney_palak', password: 'varshney' },
+      { username: 'khushi_rathi', password: 'khhushii' }
+    ];
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username-field').value.trim();
+      const password = document.getElementById('password-field').value;
+      if (validUsers.some(u => u.username === username && u.password === password)) {
+        localStorage.setItem('revive_user', username);
+        window.location.href = 'Menu1.html';
+      } else {
+        loginError.classList.add('show');
+        setTimeout(() => loginError.classList.remove('show'), 3000);
+      }
+    });
+  </script>
+</body>
 </html>
-

@@ -1,169 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>REVIVE</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.png"/>
+  <title>REVIVE — Mood Tracker</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--bg-light); }
 
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="moodtracker.css">
+    .mt-hero {
+      background: var(--gradient-hero);
+      padding: 1.25rem 0;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .mt-hero h1 { color: white; font-size: 1.3rem; margin-bottom: 0.15rem; }
+    .mt-hero p { color: rgba(255,255,255,0.75); font-size: 0.82rem; }
 
+    .mt-date-card {
+      background: white; border-radius: var(--radius-md);
+      padding: 0.6rem 1rem; box-shadow: var(--shadow-sm);
+      text-align: center; margin: -0.8rem auto 0.75rem;
+      max-width: 320px; position: relative; z-index: 3;
+      border: 1px solid var(--border-subtle);
+    }
+    .mt-date-card h4 { font-family: var(--font-body); font-weight: 600; font-size: 0.85rem; }
 
-  <title>Mood Tracker</title>
-  
+    .mt-content { padding: 0 0 1.5rem; }
+    .mt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; align-items: start; }
 
+    /* Mood Chart Card */
+    .mood-chart-card {
+      background: white; border-radius: var(--radius-lg);
+      padding: 1rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+    }
+    .mood-chart-card h3 {
+      font-family: var(--font-body); font-size: 0.9rem;
+      font-weight: 600; margin-bottom: 0.5rem; text-align: center;
+    }
+
+    #moodContainer {
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* Uniform grid with fixed-size squares */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 24px repeat(6, 20px);
+      gap: 3px;
+      justify-content: center;
+      margin-bottom: 1px;
+    }
+    .grid-container > div:first-child {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 2px;
+      font-weight: 600;
+    }
+
+    #gridContainerLabel {
+      display: grid;
+      grid-template-columns: 24px repeat(6, 20px);
+      gap: 3px;
+      justify-content: center;
+      margin-bottom: 4px;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+      padding: 2px 0 4px;
+    }
+    .grid-label {
+      grid-column: span 2;
+      text-align: center;
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .grid-item {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .grid-item:hover {
+      transform: scale(1.25);
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .grid-item-today {
+      border: 2px solid var(--muted-teal) !important;
+      box-shadow: 0 0 6px rgba(122,158,155,0.35);
+    }
+
+    .moodType-5 { background-color: var(--slate-blue); }
+    .moodType-4 { background-color: var(--muted-teal); }
+    .moodType-3 { background-color: var(--sage-mist); }
+    .moodType-2 { background-color: var(--warm-peach); }
+    .moodType-1 { background-color: var(--periwinkle); }
+    .moodType-0 { background-color: #f0f0f0; }
+
+    /* Legend */
+    .mood-legend { margin-top: 0.6rem; }
+    .mood-legend table { width: 100%; border-collapse: collapse; }
+    .mood-legend tr { border-bottom: 1px solid var(--border-subtle); }
+    .mood-legend tr:last-child { border-bottom: none; }
+    .mood-legend th, .mood-legend td { padding: 0.25rem 0.2rem; font-size: 0.7rem; text-align: left; }
+    .mood-legend th { display: flex; align-items: center; gap: 0.3rem; font-weight: 500; }
+    .mood-legend td { color: var(--text-muted); text-align: right; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+
+    /* Journal */
+    .journal-card {
+      background: white; border-radius: var(--radius-lg);
+      padding: 0.85rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+    }
+    .journal-card h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    .journal-entries { max-height: 200px; overflow-y: auto; margin-bottom: 0.75rem; }
+    .journal-entry { padding: 0.5rem; border-bottom: 1px solid var(--border-subtle); }
+    .journal-entry:last-child { border-bottom: none; }
+    .journal-entry-date { font-size: 0.65rem; color: var(--text-light); font-weight: 600; }
+    .journal-entry-title { font-weight: 600; font-size: 0.82rem; margin: 1px 0; }
+    .journal-entry-content { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+
+    .journal-empty { text-align: center; padding: 0.75rem; color: var(--text-light); font-size: 0.8rem; }
+
+    .journal-form { border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; }
+    .journal-form h4 { font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .journal-form .form-group { margin-bottom: 0.6rem; }
+    .journal-form .form-input { padding: 0.5rem 0.65rem; font-size: 0.82rem; }
+    .journal-form textarea.form-input { min-height: 50px; }
+
+    /* Year Progress */
+    .progress-card {
+      background: white; border-radius: var(--radius-lg);
+      padding: 0.85rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle); margin-top: 0.85rem;
+    }
+    .progress-card h3 { font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .progress-bar-container { width: 100%; height: 10px; background: var(--bg-light); border-radius: 8px; overflow: hidden; }
+    .progress-bar-fill {
+      height: 100%; background: var(--gradient-primary); border-radius: 8px;
+      transition: width 1s ease; display: flex; align-items: center;
+      justify-content: flex-end; padding-right: 6px;
+      font-size: 0.55rem; color: white; font-weight: 600; min-width: 30px;
+    }
+    .progress-info { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+    @media (max-width: 768px) { .mt-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-<!-- Dashboard -->
-  <div id="content" class="container">
-    <div class="jumbotron bg-info text-white">
-      <h1 class="display-4">Hey Buddy!</h1>
-      <hr class="my-4">
-      <p class="lead">Welcome to your daily mood tracker. how do you feel today?</p>
-      
-    </div>
-    
-    <div class="card">
-      <div class="card-body">
-       <center>
-        <b>Today is:</b> <h4 id="datedisplay">31 December 2019</h4>
-      </center>
-      </div>
-    </div>
+  <nav class="nav-bar">
+    <a href="Menu1.html" class="nav-logo"><img src="revive.png" alt="Revive"><span>Revive</span></a>
+    <button class="nav-hamburger" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="Menu1.html">Dashboard</a></li>
+      <li><a href="moodttracker.html" class="active">Mood Tracker</a></li>
+      <li><a href="chatbot.html">Chat</a></li>
+      <li><a href="sc1.html">Self Care</a></li>
+      <li><a href="or.html">Resources</a></li>
+    </ul>
+  </nav>
 
-    <div class="row">
-      <div class="left-section col-lg-6">
-        <br>
-        <div class="card mood-block">
-          <div class="card-body">
-            <h4 class="text-center"><span id="moodBlock-month">December</span>'s Mood Chart</h4>
-            <hr class="my-4"> 
-            <!-- 4 -->
+  <section class="mt-hero">
+    <div class="container"><h1>Hey Buddy! 👋</h1><p>Welcome to your daily mood tracker</p></div>
+  </section>
 
+  <div class="container">
+    <div class="mt-date-card"><h4 id="datedisplay">Today</h4></div>
+
+    <div class="mt-content">
+      <div class="mt-grid">
+        <div>
+          <div class="mood-chart-card">
+            <h3>📊 <span id="moodBlock-month">Month</span>'s Mood Chart</h3>
             <div id="moodContainer">
-              <div class="justify-content-center" id="gridContainerLabel">
-                <div><span></span></div>
+              <div id="gridContainerLabel">
+                <div></div>
                 <div class="grid-label">Morning</div>
                 <div class="grid-label">Afternoon</div>
                 <div class="grid-label">Night</div>
               </div>
-              
             </div>
-          
+          </div>
+          <div class="mood-legend">
+            <table>
+              <tr><th><span class="legend-dot moodType-5"></span> Amazing</th><td id="percentage-4">0%</td><td id="ratio-4">0/0</td></tr>
+              <tr><th><span class="legend-dot moodType-4"></span> Great</th><td id="percentage-3">0%</td><td id="ratio-3">0/0</td></tr>
+              <tr><th><span class="legend-dot moodType-3"></span> Average</th><td id="percentage-2">0%</td><td id="ratio-2">0/0</td></tr>
+              <tr><th><span class="legend-dot moodType-2"></span> Difficult</th><td id="percentage-1">0%</td><td id="ratio-1">0/0</td></tr>
+              <tr><th><span class="legend-dot moodType-1"></span> V. Tough</th><td id="percentage-0">0%</td><td id="ratio-0">0/0</td></tr>
+            </table>
           </div>
         </div>
-      
-        <section name="moodblockLegends">
-          <br><br>
-          <table class="table table-hover">
-            <tbody>
-              <tr>
-                <th scope="row">
-                  <div style="display: inline; border: none;" class="col-sm-2 grid-item moodType-5"></div>
-                  <p style="display: inline-block;" class="col-sm-10">Amazing</p>
-                </th>
-                <td id="percentage-4">20%</td>
-                <td id="ratio-4">20 / 100</td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  <div style="display: inline;" class="col-sm-2 grid-item moodType-4"></div>
-                  <p style="display: inline-block;" class="col-sm-10">Great</p>
-                </th>
-                <td id="percentage-3">20%</td>
-                <td id="ratio-3">20 / 100</td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  <div style="display: inline;" class="col-sm-2 grid-item moodType-3"></div>
-                  <p style="display: inline-block;" class="col-sm-10">Average</p>
-                </th>
-                <td id="percentage-2">20%</td>
-                <td id="ratio-2">20 / 100</td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  <div style="display: inline;" class="col-sm-2 grid-item moodType-2"></div>
-                  <p style="display: inline-block;" class="col-sm-10">Difficult</p>
-                </th>
-                <td id="percentage-1">20%</td>
-                <td id="ratio-1">20 / 100</td>
-              </tr>
-              <tr>
-                <th scope="row">
-                  <div style="display: inline;" class="col-sm-2 grid-item moodType-1"></div>
-                  <p style="display: inline-block;" class="col-sm-10">Very Tough</p>
-                </th>
-                <td  id="percentage-0">20%</td>
-                <td id="ratio-0">20 / 100</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      
-      
-      </div>
-      
-      <div class="right-section col-lg-6">
-        <br>
-        <section name="journal">
-          <div class="card">
-            <div class="card-header"><b>Journal</b></div>
-            <div id='journalCard' class="card-body">
-              
+        <div>
+          <div class="journal-card">
+            <h3>📔 Journal</h3>
+            <div class="journal-entries" id="journalEntries">
+              <div class="journal-empty" id="journal-empty">No entries yet. Write your first one below! ✨</div>
+            </div>
+            <div class="journal-form">
+              <h4>📝 New Entry — <span id="newjournalInputDate"></span></h4>
+              <form id="form-newJournal">
+                <div class="form-group">
+                  <label class="form-label" for="input-title">Title</label>
+                  <input type="text" id="input-title" class="form-input" placeholder="What's on your mind?" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="input-journal">Thoughts</label>
+                  <textarea id="input-journal" class="form-input" rows="2" placeholder="Write freely..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:0.55rem;">Add Entry</button>
+              </form>
             </div>
           </div>
-          
-          <div id="journalCard" class="collapse">
-            <br>
-            <div class="card">
-              <div class="card-body">
-                <b>New Journal:</b> <span id="newjournalInputDate">20/05</span>
-                <hr>
-                <form id="form-newJournal">
-                  <div class="form-group">
-                    <label for="input-title">Title</label>
-                    <input required autocomplete="off" type="text" class="form-control" id="input-title" placeholder="">
-                  </div>
-                  <div class="form-group">
-                    <label for="input-journal">Write Something Here</label>
-                    <textarea required class="form-control" id="input-journal" rows="3"></textarea>
-                  </div>
-                  <button id="btn-submission-newJournal" type="submit" class="btn btn-info btn-block">Add new journal entry </button>
-                </form>
-              </div>
-            </div>
-          </div>
-          <br>
-          <button type="btn-addJournal" class="btn btn-block btn-lg btn-outline-info" data-toggle="collapse" data-target="#journalCard">Write a Journal</button> 
-        </section>
+        </div>
       </div>
-    
-    </div>
-    <br>
-    <div class="card">
-      <div class="card-body">
-        <h4>This year's progress:</h4>
-        <div class="progress" style="height: 3em;">
-            <div id="yearProgress" class="progress-bar progress-bar-animated progress-bar-step bg-info" role="progressbar" style="width: 1%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0 - check JS</div>
-          </div>
-          <hr class="my-4">
-          <p><span id='lastDays'>32</span> day remaining until new year</p>
+      <div class="progress-card">
+        <h3>📅 Year's Progress</h3>
+        <div class="progress-bar-container"><div class="progress-bar-fill" id="yearProgress">0%</div></div>
+        <p class="progress-info"><span id="lastDays">0</span> days until new year</p>
       </div>
     </div>
-
   </div>
-  
+
+  <script src="main.js"></script>
+  <script>document.getElementById('nav-toggle').addEventListener('click',()=>{document.getElementById('nav-links').classList.toggle('open')});</script>
 </body>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="main.js"></script>
-<script scr="server.js"></script>
-
-
-
 </html>

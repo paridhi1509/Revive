@@ -1,46 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="or.css">
-    <title>REVIVE</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REVIVE — Helplines & Resources</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--bg-light); }
+
+    .res-hero {
+      background: var(--gradient-hero);
+      padding: 1.25rem 0;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .res-hero h1 { color: white; font-size: 1.3rem; margin-bottom: 0.15rem; }
+    .res-hero p { color: rgba(255,255,255,0.75); font-size: 0.82rem; max-width: 420px; margin: 0 auto; }
+
+    .helplines-section { padding: 1.25rem 0; }
+    .helpline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+
+    .helpline-card {
+      background: white; border-radius: var(--radius-md);
+      padding: 0.85rem; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s ease; display: flex; flex-direction: column;
+    }
+    .helpline-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+    .helpline-icon {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      background: rgba(122,158,155,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; margin-bottom: 0.5rem;
+    }
+
+    .helpline-card h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .helpline-card p { font-size: 0.78rem; margin-bottom: 0.5rem; flex: 1; }
+
+    .helpline-phone {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.4rem 0.85rem;
+      background: var(--gradient-primary); color: white;
+      border-radius: var(--radius-xl);
+      font-weight: 600; font-size: 0.78rem;
+      transition: all 0.3s ease;
+    }
+    .helpline-phone:hover { transform: scale(1.02); box-shadow: 0 3px 10px rgba(91,109,138,0.3); }
+
+    .helpline-hours { font-size: 0.68rem; color: var(--text-light); margin-top: 0.3rem; }
+
+    .emergency-section { padding: 0 0 1rem; }
+    .emergency-card {
+      background: linear-gradient(135deg, rgba(222,196,173,0.12), rgba(196,212,232,0.12));
+      border: 1.5px solid var(--warm-peach);
+      border-radius: var(--radius-md);
+      padding: 1rem; text-align: center;
+    }
+    .emergency-card h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .emergency-card p { margin-bottom: 0.4rem; font-size: 0.82rem; }
+    .emergency-card a { color: var(--muted-teal); font-weight: 600; }
+    .emergency-card a:hover { text-decoration: underline; }
+
+    .res-footer {
+      background: var(--gradient-primary); color: white;
+      text-align: center; padding: 0.75rem; font-size: 0.78rem;
+    }
+    .res-footer p { color: rgba(255,255,255,0.85); }
+
+    @media (max-width: 768px) { .helpline-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Mental Health Helplines</h1>
-    </header>
+  <nav class="nav-bar">
+    <a href="Menu1.html" class="nav-logo"><img src="revive.png" alt="Revive"><span>Revive</span></a>
+    <button class="nav-hamburger" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="Menu1.html">Dashboard</a></li>
+      <li><a href="moodttracker.html">Mood Tracker</a></li>
+      <li><a href="chatbot.html">Chat</a></li>
+      <li><a href="sc1.html">Self Care</a></li>
+      <li><a href="or.html" class="active">Resources</a></li>
+    </ul>
+  </nav>
 
-    <!-- Existing helpline boxes -->
+  <section class="res-hero">
+    <div class="container"><h1>Helplines & Resources 📞</h1><p>You are never alone. Reach out for support whenever you need it.</p></div>
+  </section>
 
-    <div class="helpline">
-        <h2>Vandrevala Foundation Helpline</h2>
-        <p>Phone: <a href="tel:+91 1860 2662 345">+91 1860 2662 345</a></p>
+  <section class="helplines-section">
+    <div class="container">
+      <div class="helpline-grid">
+        <div class="helpline-card animate-fade-in-up delay-1">
+          <div class="helpline-icon">🏥</div>
+          <h3>Vandrevala Foundation</h3>
+          <p>Free, 24/7 professional counseling for emotional distress.</p>
+          <a href="tel:+911860266234" class="helpline-phone">📞 +91 1860 2662 345</a>
+          <span class="helpline-hours">24/7 • All languages</span>
+        </div>
+        <div class="helpline-card animate-fade-in-up delay-2">
+          <div class="helpline-icon">🌸</div>
+          <h3>Roshni</h3>
+          <p>Emotional support and crisis intervention counseling.</p>
+          <a href="tel:+919140811114" class="helpline-phone">📞 +91 91408 11114</a>
+          <span class="helpline-hours">Mon-Sat • 11 AM - 9 PM</span>
+        </div>
+        <div class="helpline-card animate-fade-in-up delay-3">
+          <div class="helpline-icon">💙</div>
+          <h3>iCall (TISS)</h3>
+          <p>Free psychosocial counseling services.</p>
+          <a href="tel:+912225521111" class="helpline-phone">📞 +91 22 2552 1111</a>
+          <span class="helpline-hours">Mon-Sat • 8 AM - 10 PM</span>
+        </div>
+        <div class="helpline-card animate-fade-in-up delay-4">
+          <div class="helpline-icon">🧠</div>
+          <h3>VIMHANS</h3>
+          <p>Psychiatric care and counseling institute.</p>
+          <a href="tel:+919818878308" class="helpline-phone">📞 +91 98188 78308</a>
+          <span class="helpline-hours">Contact for hours</span>
+        </div>
+      </div>
     </div>
-    <div class="helpline">
-        <h2>Roshni</h2>
-        <p>Phone:<a href="tel:+91 91408 11114">+91 91408 11114</a></p>
-    </div>
+  </section>
 
-    <div class="helpline">
-        <h2>iCall</h2>
-        <p>Phone:<a href="tel:+91 22 2552 1111"> +91 22 2552 1111 </a>(Mon-Sat, 8 AM - 10 PM) </p>
+  <section class="emergency-section">
+    <div class="container container-sm">
+      <div class="emergency-card">
+        <h3>📧 Contact Revive</h3>
+        <p>Questions or suggestions? Reach out to us.</p>
+        <a href="mailto:letsreviveourself@gmail.com">letsreviveourself@gmail.com</a>
+      </div>
     </div>
+  </section>
 
-    <div class="helpline">
-        <h2>VIMHANS (Vidyasagar Institute of Mental Health and Neuro-Sciences)</h2>
-        <p>Phone: <a href="tel:+919818878308">+91 98188 78308</a></p>
-    </div>
+  <footer class="res-footer"><p>⚠️ For emergencies, contact your local hospital or emergency services.</p></footer>
 
-
-    <!-- Add the Emergency Contact section -->
-    <div class="emergency-contact">
-        <h2>Contact us</h2>
-        <p>Email: <a href="mailto:letsreviveourself@gmail.com">letsreviveourself@gmail.com</a></p>
-    </div>
-    
-    <footer>
-        <p>For immediate assistance or emergencies, please contact your local hospital or emergency services.</p>
-    </footer>
+  <script>document.getElementById('nav-toggle').addEventListener('click',()=>{document.getElementById('nav-links').classList.toggle('open')});</script>
 </body>
 </html>

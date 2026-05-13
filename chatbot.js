@@ -1,186 +1,333 @@
-function sendMessage() {
-    const userInput = document.getElementById("user-input");
-    const messageText = userInput.value.trim();
-  
-    if (messageText === "") {
-      return;
-    }
-  
-    const chatbotMessages = document.getElementById("chatbot-messages");
-  
-    // new user message
-    const userMessage = document.createElement("div");
-    userMessage.className = "chatbot-message user";
-    userMessage.textContent = messageText;
-  
-    // Append the user message to the chat
-    chatbotMessages.appendChild(userMessage);
-  
-    // Clear the user input
-    userInput.value = "";
-  
-    // Process user input and generate bot response
-    const botResponse = generateBotResponse(messageText);
-  
-    // Create a new bot message
-    const botMessage = document.createElement("div");
-    botMessage.className = "chatbot-message bot";
-    botMessage.textContent = botResponse;
-  
-    // Append the bot message to the chat
-    chatbotMessages.appendChild(botMessage);
-  
-    // Scroll to the bottom of the chat to show the latest message
-    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+// ================================================
+// REVIVE — Enhanced Chatbot Engine
+// ================================================
+
+// --- Response Database ---
+const responses = {
+  greeting: {
+    keywords: ['hello', 'hi', 'hey', 'good morning', 'good evening', 'good afternoon', 'howdy', 'greetings'],
+    replies: [
+      "Hello! 😊 How are you feeling today? I'm here to listen.",
+      "Hey there! 🌟 Welcome. What's on your mind today?",
+      "Hi! I'm glad you're here. How can I support you today?",
+    ]
+  },
+  notWell: {
+    keywords: ['not feeling good', 'not well', 'not great', 'feeling bad', 'feeling down', 'not okay', 'feeling low', 'sad'],
+    replies: [
+      "I'm sorry to hear that. 💙 Would you like to talk about what's bothering you? I'm here to listen without judgment.",
+      "It takes courage to share how you feel. Tell me more — what's been weighing on you?",
+      "I hear you. Sometimes putting feelings into words helps. What's going on?",
+    ]
+  },
+  stress: {
+    keywords: ['stress', 'stressed', 'stressful', 'overwhelmed', 'pressure', 'burned out', 'burnout'],
+    replies: [
+      "I understand you're feeling stressed. 🌿 Here are some things that might help:\n\n• Take slow, deep breaths (4-7-8 technique)\n• Step away for a 5-minute walk\n• Write down what's stressing you\n• Talk to someone you trust\n\nRemember, stress is temporary. You've handled tough times before! 💪",
+      "Stress can feel overwhelming, but you're not alone. Try the 5-4-3-2-1 grounding technique: notice 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. It helps bring you back to the present. 🧘",
+    ]
+  },
+  anxiety: {
+    keywords: ['anxiety', 'anxious', 'nervous', 'worried', 'worrying', 'panic', 'social anxiety'],
+    replies: [
+      "Anxiety can be really challenging. 💙 Here are some techniques:\n\n• Box breathing: Inhale 4s → Hold 4s → Exhale 4s → Hold 4s\n• Challenge anxious thoughts: Is this thought fact or fear?\n• Ground yourself in the present moment\n\nIf anxiety is persistent, speaking with a professional can be incredibly helpful. You're stronger than you think! 🌟",
+      "I understand feeling anxious. Remember: anxiety is your brain trying to protect you, but sometimes it overreacts. Try naming your feelings out loud — it helps reduce their power. You've got this! 💪",
+    ]
+  },
+  relationships: {
+    keywords: ['relationships', 'friends', 'friendships', 'relationship', 'partner', 'boyfriend', 'girlfriend'],
+    replies: [
+      "Relationships can be a source of both joy and stress. 💛 Remember:\n\n• It's okay to set boundaries\n• Communication is key — express your needs\n• Surround yourself with people who uplift you\n• Quality matters more than quantity\n\nYou deserve healthy, supportive connections!",
+    ]
+  },
+  family: {
+    keywords: ['family', 'parents', 'parent', 'mom', 'dad', 'siblings', 'parental expectations'],
+    replies: [
+      "Family dynamics can be complex. 🏡 If you're facing pressure or conflict:\n\n• Try to have calm, honest conversations\n• Set healthy boundaries where needed\n• Remember: their expectations don't define your worth\n• Consider family counseling if communication is difficult\n\nI'm here if you want to talk more about it. 💙",
+    ]
+  },
+  exams: {
+    keywords: ['exams', 'exam', 'test', 'tests', 'academic', 'grades'],
+    replies: [
+      "Exam stress is so common — you're definitely not alone! 📚 Here's what helps:\n\n1. Create a realistic study schedule\n2. Break topics into small, manageable chunks\n3. Use active recall and spaced repetition\n4. Take breaks every 45-50 minutes\n5. Get enough sleep — your brain consolidates learning during rest\n6. Eat well and stay hydrated\n\nYou're capable of more than you think! 💪🌟",
+    ]
+  },
+  study: {
+    keywords: ['study', 'studies', 'workload', 'homework', 'assignments', 'studying'],
+    replies: [
+      "Managing studies can feel overwhelming. 📖 Try these strategies:\n\n• Prioritize tasks with a to-do list\n• Use the Pomodoro technique (25 min focus + 5 min break)\n• Find a quiet, comfortable study space\n• Don't forget to take care of yourself!\n\nYou're doing great by caring about your education. Keep going! 🌟",
+    ]
+  },
+  career: {
+    keywords: ['career', 'job', 'layoff', 'job search', 'work', 'interview', 'unemployment'],
+    replies: [
+      "Career concerns are completely valid. 💼 Remember:\n\n• Focus on what you can control — your skills and effort\n• Network and reach out to people in your field\n• Upskill with free online resources\n• Rejection isn't a reflection of your worth\n\nYour career journey is unique. Keep believing in yourself! 💪🌟",
+    ]
+  },
+  timeManagement: {
+    keywords: ['time management', 'time', 'procrastinate', 'procrastination', 'productive', 'productivity', 'lazy'],
+    replies: [
+      "Time management is a skill that improves with practice! ⏰ Try these:\n\n• Break tasks into smaller steps\n• Set specific, realistic deadlines\n• Use the 2-minute rule: if it takes <2 min, do it now\n• Remove distractions (put phone away!)\n• Celebrate small wins\n\nDon't be too hard on yourself — progress, not perfection! 💪",
+    ]
+  },
+  goals: {
+    keywords: ['goals', 'aim', 'ambition', 'dreams', 'hopes', 'future', 'purpose'],
+    replies: [
+      "Having goals shows incredible self-awareness! 🌟 Tips for achieving them:\n\n• Write them down — this makes them real\n• Break big goals into smaller milestones\n• Track your progress and celebrate wins\n• Be flexible — it's okay to adjust your path\n\nYou have the power to turn your dreams into reality! 💫",
+    ]
+  },
+  sleep: {
+    keywords: ['sleep', 'insomnia', 'cant sleep', 'sleep cycle', 'sleepless', 'nightmares', 'tired'],
+    replies: [
+      "Sleep is so important for mental health. 😴 Try these tips:\n\n• Stick to a consistent bedtime routine\n• Avoid screens 30 min before bed\n• Keep your room cool and dark\n• Try progressive muscle relaxation\n• Avoid caffeine after 2 PM\n\nSweet dreams are within reach! 🌙💤",
+    ]
+  },
+  bullying: {
+    keywords: ['bullies', 'bullied', 'bullying', 'online bullies', 'cyberbullying', 'harassment', 'mean'],
+    replies: [
+      "Bullying is never acceptable, and it's NOT your fault. 🛡️\n\n• Document the incidents\n• Tell a trusted adult or authority figure\n• Block and report online bullies\n• Remember: their behavior reflects THEM, not you\n\nYou are valued and worthy of respect. Don't let anyone make you feel otherwise! ❤️💪",
+    ]
+  },
+  frustration: {
+    keywords: ['frustration', 'frustrated', 'frustrate', 'angry', 'anger', 'mad', 'furious', 'irritated'],
+    replies: [
+      "Frustration is a valid emotion. 🌊 When it feels overwhelming:\n\n• Take deep breaths — count to 10\n• Step away from the situation briefly\n• Physical activity helps release tension\n• Write down what's frustrating you\n\nIt's temporary. You'll get through this! 💪❤️",
+    ]
+  },
+  confidence: {
+    keywords: ['low confidence', 'self esteem', 'not confident', 'insecure', 'worthless', 'not enough', 'doubt myself'],
+    replies: [
+      "You are more capable than you realize! 💪🌟\n\n• List 3 things you're good at right now\n• Celebrate small achievements daily\n• Replace 'I can't' with 'I'm learning to'\n• Surround yourself with people who uplift you\n• Remember: confidence is built through action, not perfection\n\nYou are enough, exactly as you are! ✨",
+    ]
+  },
+  comparison: {
+    keywords: ['comparisons', 'compare', 'than me', 'better than me', 'jealous', 'envy', 'comparison'],
+    replies: [
+      "Comparison truly is the thief of joy. 🌈 Remember:\n\n• Everyone's timeline is different\n• Social media shows highlight reels, not reality\n• Focus on YOUR growth — compare yourself to who you were yesterday\n• Your journey is uniquely yours\n\nYou're doing amazing in your own way! 😊",
+    ]
+  },
+  suicidal: {
+    keywords: ['suicides', 'suicide', 'suicidal', 'kill myself', 'end my life', 'dont want to live', 'self harm'],
+    replies: [
+      "I'm really concerned about you, and I want you to know that you matter. 💙\n\n🆘 Please reach out for immediate help:\n• Vandrevala Foundation: +91 1860 2662 345\n• iCall: +91 22 2552 1111\n• Roshni: +91 91408 11114\n\nYou are not alone. Things can get better with the right support. Please talk to someone you trust. 🤗\n\nMore resources: https://values.snap.com/safety/safety-resources",
+    ]
+  },
+  lonely: {
+    keywords: ['lonely', 'loneliness', 'leftout', 'alone', 'isolated', 'no friends', 'left out'],
+    replies: [
+      "Feeling lonely is more common than you think — you're not alone in feeling alone. 💙\n\n• Try reaching out to one person today\n• Join a club, group, or online community\n• Volunteer — helping others creates connections\n• Be gentle with yourself\n\nYou deserve companionship and love. I'm here for you! 🌟",
+    ]
+  },
+  selfCare: {
+    keywords: ['self care', 'self-care', 'self care practices', 'take care', 'wellbeing', 'wellness'],
+    replies: [
+      "Self-care isn't selfish — it's essential! 🌼 Try these:\n\n• Take a relaxing bath or warm shower\n• Go for a walk in nature 🌿\n• Practice mindfulness or meditation\n• Listen to calming music\n• Do something creative you enjoy\n• Get enough sleep and eat nourishing food\n\nYou deserve to feel good! 💛",
+    ]
+  },
+  exercises: {
+    keywords: ['suggest', 'exercises', 'breathing', 'breathe', 'meditation', 'meditate', 'calm down'],
+    replies: [
+      "Let's try a breathing exercise together! 🧘\n\n✨ **4-7-8 Technique:**\n1. Inhale through your nose for 4 counts\n2. Hold your breath for 7 counts\n3. Exhale slowly through your mouth for 8 counts\n4. Repeat 4 times\n\nThis activates your parasympathetic nervous system and helps calm anxiety. Try it now! 🌬️",
+    ]
+  },
+  counseling: {
+    keywords: ['counseling', 'therapy', 'therapist', 'counselor', 'professional help', 'need help'],
+    replies: [
+      "Seeking professional help is a sign of strength, not weakness! 🌟\n\n• Talk to your school/college counselor\n• Reach out to helplines:\n  - Vandrevala Foundation: +91 1860 2662 345\n  - iCall: +91 22 2552 1111\n• Consider online therapy platforms\n\nYou deserve support. Taking this step shows incredible courage! 💙",
+    ]
+  },
+  help: {
+    keywords: ['help', 'improve', 'what can i do', 'how to', 'tips', 'advice'],
+    replies: [
+      "There are many ways to improve your mental wellbeing! 🌈\n\n• Practice regular breathing exercises\n• Stay connected with supportive people\n• Move your body — even a short walk helps\n• Journal your thoughts and feelings\n• Get enough sleep and eat well\n• Do things that bring you joy\n\nSmall steps lead to big changes! 💪",
+    ]
+  },
+  peerPressure: {
+    keywords: ['peer pressure', 'pressure from friends', 'forced', 'fitting in'],
+    replies: [
+      "Peer pressure can be tough to navigate. 🛡️ Remember:\n\n• It's okay to say NO\n• True friends respect your boundaries\n• Stay true to your values\n• You don't need to fit in to belong\n\nTrust your instincts — you know what's right for you! 💪🌟",
+    ]
+  },
+  lgbtq: {
+    keywords: ['lgbtq', 'gay', 'lesbian', 'bisexual', 'transgender', 'queer', 'coming out', 'identity'],
+    replies: [
+      "Your identity is valid and beautiful. 🌈\n\n• Surround yourself with accepting, supportive people\n• Connect with LGBTQ+ communities and resources\n• You deserve love and respect exactly as you are\n• Coming out is your journey — go at your own pace\n\nYou are not alone. You are loved! 💙🏳️‍🌈",
+    ]
+  },
+  homesickness: {
+    keywords: ['homesickness', 'homesick', 'miss home', 'away from home', 'miss family'],
+    replies: [
+      "Homesickness is completely natural. 🏡💙\n\n• Stay connected through video calls\n• Create a comforting space wherever you are\n• Share photos and memories with loved ones\n• Explore your new surroundings — find new favorites\n• Remember: it gets easier with time\n\nHome is always in your heart! 💛",
+    ]
+  },
+  bodyImage: {
+    keywords: ['body image', 'body', 'weight', 'too fat', 'too thin', 'ugly', 'appearance'],
+    replies: [
+      "Your worth is not defined by your appearance. 🌟💕\n\n• Beauty comes in ALL shapes and sizes\n• Unfollow social media that makes you feel bad\n• Focus on what your body CAN do, not how it looks\n• Practice positive self-talk\n• Nourish your body with love and care\n\nYou are beautiful exactly as you are! ✨",
+    ]
+  },
+  financial: {
+    keywords: ['financial stress', 'finance', 'money', 'debt', 'broke', 'expensive'],
+    replies: [
+      "Financial stress is tough but manageable. 💸\n\n• Create a simple budget to track spending\n• Prioritize needs over wants\n• Look for scholarships, grants, or part-time work\n• Don't compare your financial journey to others\n• Ask for guidance from trusted adults\n\nFinancial stability is built one step at a time! 💪",
+    ]
+  },
+  disconnected: {
+    keywords: ['disconnected', 'detached', 'numb', 'empty', 'nothing', 'dont feel'],
+    replies: [
+      "Feeling disconnected can be unsettling. 💙\n\n• Try grounding exercises (feel your feet on the floor)\n• Engage your senses — hold ice, smell something strong\n• Reach out to someone — even a short text counts\n• Be gentle with yourself\n• Consider talking to a professional\n\nYou're not broken. This is temporary. 🌟",
+    ]
+  },
+  depression: {
+    keywords: ['depressed', 'depression', 'hopeless', 'no motivation', 'give up'],
+    replies: [
+      "I hear you, and I'm really sorry you're feeling this way. 💙\n\n• Please reach out to a trusted person or professional\n• Helplines:\n  - Vandrevala: +91 1860 2662 345\n  - iCall: +91 22 2552 1111\n• Take it one moment at a time\n• Even getting through today is an achievement\n\nYou are stronger than depression. Help is available. 🌟",
+    ]
+  },
+  happy: {
+    keywords: ['happy', 'excited', 'amazing', 'wonderful', 'great', 'good', 'awesome', 'fantastic'],
+    replies: [
+      "That's wonderful to hear! 😄🌟 Keep riding that positive wave! What made your day special?",
+      "Yay! 🎉 I'm so glad you're feeling good. Cherish this moment and remember it when tougher times come!",
+      "That makes me happy too! 😊 You deserve every bit of joy. Keep shining! ✨",
+    ]
+  },
+  thanks: {
+    keywords: ['thanku', 'thank you', 'thankyou', 'thanks', 'thx', 'appreciate'],
+    replies: [
+      "You're so welcome! 😊 Remember, I'm always here whenever you need someone to talk to. Take care of yourself! 🌟💙",
+      "Happy to help! Don't hesitate to come back anytime. You matter! 💛✨",
+    ]
+  },
+  sorry: {
+    keywords: ['sorry', 'apologize', 'my bad', 'apologies'],
+    replies: [
+      "No need to apologize! 💙 It's okay. We all go through ups and downs. If something specific is bothering you, I'm here to listen. You're doing great! ✨",
+    ]
+  },
+  bye: {
+    keywords: ['bye', 'goodbye', 'good bye', 'see you', 'gotta go', 'leaving'],
+    replies: [
+      "Take care of yourself! 🌿 Remember, I'm always here when you need to talk. Goodbye and stay strong! 💙✨",
+      "Bye! 🌟 Wishing you a peaceful day. Come back anytime you need support! 😊",
+    ]
+  },
+  ok: {
+    keywords: ['ok', 'okay', 'alright', 'fine', 'sure', 'i see'],
+    replies: [
+      "I'm here whenever you need to talk more. Is there anything specific on your mind? 😊",
+      "Take your time. If anything comes up, just let me know! 💙",
+    ]
   }
-  
-  // Function to generate bot responses based on user input
-  function generateBotResponse(userInput) {
-    if (userInput.includes("hello") || userInput.includes("hi ")) {
-      return "Hello! How are you today?";
-    } 
-    else if(userInput.includes("not feeling good")||userInput.includes("not well")){
-        return "Tell me about it"
-    }
-    else if (userInput.includes("stress")) {
-      return "I understand you're feeling stressed. Let's talk about ways to manage stress.Take deep breaths, do activities you enjoy, and seek support from friends or counseling. You've got this!";
-    } else if (userInput.includes("job") || userInput.includes("layoff")) {
-      return "Job concerns can be challenging. It's essential to focus on what you can control and seek support.";}
-      else if (userInput.includes("relationships") || userInput.includes("friends")|| userInput.includes("friendships") ){
-        return "It's understandable to feel stressed about both relationships and friendships. Remember that it's okay to prioritize self-care and set boundaries. Surround yourself with supportive people who uplift you. You deserve healthy and positive connections! ";
+};
+
+// --- Chatbot Engine ---
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const typingIndicator = document.getElementById('typing-indicator');
+const quickRepliesContainer = document.getElementById('quick-replies');
+
+let conversationContext = null;
+
+function getTimeString() {
+  const now = new Date();
+  return now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function addMessage(text, type) {
+  const msg = document.createElement('div');
+  msg.className = `message message-${type}`;
+  msg.innerHTML = `
+    <div class="message-bubble">${text.replace(/\n/g, '<br>')}</div>
+    <div class="message-time">${getTimeString()}</div>
+  `;
+  chatMessages.appendChild(msg);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTyping() {
+  typingIndicator.classList.add('show');
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTyping() {
+  typingIndicator.classList.remove('show');
+}
+
+function generateResponse(input) {
+  const lowerInput = input.toLowerCase().trim();
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const [category, data] of Object.entries(responses)) {
+    for (const keyword of data.keywords) {
+      if (lowerInput.includes(keyword)) {
+        // Score based on keyword length (longer = more specific = better match)
+        const score = keyword.length;
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = data;
+          conversationContext = category;
+        }
       }
-      else if(userInput.includes("help")|| userInput.includes("improve")){
-        return "You can improve your mental health in many ways like doing breathing exercises, going out with people you can have fun with or doing something that makes you happy."
-      }
-      else if(userInput.includes("suggest")||userInput.includes("exercises")){
-        return "I can suggest some breathing exercises to you. Let's take a few deep breaths together.\nInhale for 4 counts, hold for 7 counts, and exhale for 8 counts."
-      }
-      else if(userInput.includes("exams")){
-        return "I'm sorry to hear that you're feeling stressed. Exams can be a challenging time, but there are things you can do to manage your stress and stay focused on your studies.Here are a few tips: \n 1)Create a study schedule and stick to it. This will help you stay organized and avoid feeling overwhelmed.\n 2)Break down your studying into smaller tasks. This will make it seem less daunting and more achievable.\n 3)Take breaks when you need them.Don't try to study for hours on end without taking a break. Get up and move around, or step outside for some fresh air.\n 4)Eat healthy foods and get enough sleep.\n These things will help you stay energized and focused.Talk to someone if you're feeling overwhelmed. Friends, family, or a therapist can offer support and help you cope with your stress.If you're feeling like you're struggling to manage your stress on your own, please reach out to a mental health professional. They can provide you with more support and resources."
-      }
-      else if(userInput.includes("family")){
-        return "I understand your concern for your family. If you have any specific questions or if there's something you'd like to discuss or share about your worries, please feel free to do so, and I'll be here to assist you."
-      }
-//______________________________________________________
-/*    else if(userInput.includes(" ")){
-         return " "
-       }
-
-     ||userInput.includes(" ")
-     
-Its best if you learn it from experts . Here are some helpful resources to check out : */
-
-//__________________________________________________
-
-else if(userInput.includes("career ")){
-  return "I get it, career stress is real! Just remember to stay focused, keep learning, and believe in yourself. You've got this! 💼💪 "
-}
-
-else if(userInput.includes("time management")){
-  return "I feel you! Time management can be a challenge. Try breaking tasks into smaller chunks and setting specific goals. Use timers or apps to stay focused. You got this! ⏰💪\nDon't worry, I've been there too! Start by prioritizing tasks and setting deadlines for yourself. You'll improve with practice! ⏰💪 "
-}
-
-else if(userInput.includes("procrastinate")||userInput.includes("procrastination")){
-  return "I feel you! Procrastination can be a struggle. Break tasks into smaller parts and set deadlines. You can do it! ⏰💪 "
-}
-else if(userInput.includes("goals")||userInput.includes("aim")
-){
-  return "I totally get it! Working on goals can be tough, but remember to take it one step at a time. Break your goals into smaller tasks and celebrate each milestone along the way. You've got this! 💪🌟 "
-}
-else if(userInput.includes("Sleep ")||userInput.includes("sleep cycle")
-){
-  return "I totally get it! Having a bad sleep cycle can be tough. Try establishing a consistent bedtime routine and creating a relaxing sleep environment. You've got this! 😴💤 "
-}
-else if(userInput.includes("bullies")||userInput.includes("bullied")||userInput.includes("bullying")||userInput.includes("online bullies")||userInput.includes("online bullies")){
-  return "I hate bullies too! It's not fair that some people try to bring others down. Just remember, you're amazing and don't let their negativity affect you. Surround yourself with positive people who lift you up. You've got this! 💪❤️"
-}
-else if(userInput.includes("frustration")||userInput.includes("frustrated")||userInput.includes("frustrate")
-){
-  return "I understand how you feel. Frustration can be overwhelming, but remember that it's just a temporary feeling. Take a deep breath, step back, and try to break down the problem into smaller, manageable tasks. You've got this! 💪❤️\nI understand how you feel. Frustration can be overwhelming, but remember that it's just a temporary feeling. Take a deep breath, step back, and try to break down the problem into smaller, manageable tasks. You've got this! 💪❤️"
-}
-else if(userInput.includes("low confidence")||userInput.includes("self esteem")){
-  return "You've got this! Believe in yourself and your abilities. Remember to embrace your strengths and accomplishments. You are capable of amazing things! Keep shining with confidence! 💪🌟"
-}
-else if(userInput.includes("Comparisons")||userInput.includes("compare")||userInput.includes("than me")){
-  return "I understand how comparisons can sometimes make us feel frustrated. Remember that everyone's journey is unique, and it's important to focus on your own progress and achievements. You're doing great in your own way! 😊"
-}
-/// ok thanku sorry 
-else if(userInput.includes("ok")){
-  return "I totally get it! Life can be tough, but you've got this! Take it one step at a time, stay organized, and don't hesitate to ask for help when you need it. Remember to take breaks and reward yourself for your hard work. You're doing great! Keep up the good work! 📚💪"
-}
-else if(userInput.includes("thanku") ||userInput.includes("thank you") ||userInput.includes("thankyou") ||userInput.includes("thanks")){
-  return "You're welcome! Remember, I'm here for you whenever you need someone to talk to. Take care of yourself and don't hesitate to reach out if you need anything. You've got this! 😊🌟"
-}
-else if(userInput.includes("sorry")){
-  return "It's okay to feel sorry sometimes. We all make mistakes and it's a sign of growth and empathy to recognize when we've done something wrong. If there's something specific you're feeling sorry about, maybe we can talk about it and see if there's a way to make amends or learn from the experience. Remember, we're all learning and growing together! 💙✨"
-}
-else if(userInput.includes("suicides") ||userInput.includes("suicide") ||userInput.includes("suicidal thoughts")){
-  return "I'm sorry to hear that you're feeling sad. It's okay to have those emotions sometimes. Remember to take care of yourself, reach out to loved ones for support, and engage in activities that bring you joy. Sending virtual hugs your way! 🤗💙\nIts best if you learn it from experts . Here are some helpful resources to check out : https://values.snap.com/safety/safety-resources "
-}
-
-else if(userInput.includes("lonely")||userInput.includes("lonliness")||userInput.includes("leftout")){
-  return "I understand that feeling lonely can be tough. It's important to remember that you are not alone in this. Reach out to friends or loved ones, or try engaging in activities that bring you joy and help you connect with others. You deserve companionship and support! 🌟💙"
-}
-
-//self care practices
-else if(userInput.includes("self care practices")){
-  return "When you're feeling stressed or low, self-care practices can help you feel better. Some ideas include taking a relaxing bath, going for a walk in nature, practicing mindfulness or meditation, listening to calming music, or indulging in a hobby you enjoy. Remember to prioritize your well-being and do things that bring you joy and relaxation. You deserve it! 🌼💛"
-}
-//i need counselling
-else if(userInput.includes("counseling")){
-  return "I understand that you're feeling like you need counseling. It's great that you're seeking support! I recommend reaching out to a professional counselor or therapist who can provide guidance and assistance tailored to your specific needs. They can help you navigate through your challenges and provide valuable insights. Remember, seeking help is a sign of strength! 🌟💙"
-}
-else if(userInput.includes("peer pressure")){
-  return "I understand that peer pressure can be challenging to deal with. Remember, it's important to stay true to yourself and your values. Surround yourself with supportive friends who uplift you and share your values. If you ever feel pressured to do something that makes you uncomfortable, it's okay to say no and set boundaries. Trust your instincts and prioritize your well-being. You've got this! 💪🌟"
-}
-// else if(userInput.includes("Parental expectations")||userInput.includes("parent")||userInput.includes("parents")||userInput.includes("mom")||userInput.includes("")){
-//   return "I understand that parental expectations can feel overwhelming at times. It's important to have open and honest communication with your parents about your goals, interests, and concerns. Expressing your thoughts and feelings can help them understand your perspective better. Remember, it's okay to set boundaries and pursue your own path. Surround yourself with supportive friends who can boost your confidence and provide encouragement. You have the ability to shape your own future. Believe in yourself! 🌟💪"
-// }
-else if(userInput.includes("LGBTQ")){
-  return "Supportive friends can play a crucial role in boosting confidence and providing encouragement for LGBTQ individuals. It's important to surround yourself with people who accept and celebrate your identity. Remember, you are valid and deserving of love and respect. If you ever need someone to talk to, I'm here for you! 🌈💙"
-}
-//may cancel later
-//link added
-else if(userInput.includes("Social anxiety")){
-  return "I understand that social anxiety can be challenging to deal with. It's important to remember that you're not alone in this. Taking small steps, like practicing deep breathing or positive self-talk, can help manage anxiety in social situations. Surrounding yourself with supportive friends who understand and accept you can also make a big difference. You're stronger than you think! 💪💙\nIts best if you learn it from experts . Here are some helpful resources to check out : https://values.snap.com/safety/safety-resources"
-}
-
-else if(userInput.includes("homesickness")||userInput.includes("homesick")||userInput.includes("miss home")||userInput.includes("away from home")){
-  return "I understand that homesickness can be tough. It's normal to miss the familiar comforts of home. One way to cope is by staying connected with loved ones through calls, video chats, or sharing pictures. Exploring your new surroundings and making new friends can also help create a sense of belonging. Remember, it's okay to feel homesick, but try to focus on the positive experiences and opportunities that come with being in a new place. Hang in there! 🏡💙"
-}
-else if(userInput.includes("body image")){
-  return "I understand that body image can be a sensitive topic. Remember, beauty comes in all shapes and sizes. Surround yourself with positive influences and focus on self-care and self-acceptance. Embrace your unique qualities and celebrate what makes you special. You are beautiful just the way you are! 🌟💕"
-}
-else if(userInput.includes("financial stress")||userInput.includes("finance")||userInput.includes("money")){
-  return "I understand that financial stress can be overwhelming. It's important to take a proactive approach by creating a budget, prioritizing expenses, and seeking financial advice if needed. Remember, you're not alone in this. Reach out to supportive friends or family for guidance and support. Stay positive and take small steps towards financial stability. You've got this! 💪💸"
-}
-else if(userInput.includes("study")||userInput.includes("studies")||userInput.includes("workload")){
-  return "I understand that you're a student and may be feeling stressed about studies. It's important to find effective study techniques that work for you, such as creating a study schedule, breaking tasks into smaller chunks, and finding a quiet and comfortable study space. Don't forget to take breaks and practice self-care to avoid burnout. Remember, you're capable and smart! Keep pushing forward and believe in yourself. 📚💪"
-}
-else if(userInput.includes("job")||userInput.includes("job search")){
-  return "I understand that you're feeling stressed about your job search. It can be overwhelming, but don't lose hope! Take some time to update your resume, network with professionals in your field, and consider reaching out to job placement agencies for assistance. Remember to stay positive and persistent. The right opportunity will come your way. Keep pushing forward and believe in yourself! 💼🌟"
-}
-else if(userInput.includes("dreams")||userInput.includes("ambition")||userInput.includes("hopes")){
-  return "I totally get it! Dreams are so important. They give us something to strive for and keep us motivated. Don't be afraid to dream big and pursue what truly makes you happy. Surround yourself with supportive friends and family who believe in you. Remember, you have the power to turn your dreams into reality. Keep chasing those dreams! 🌟💫"
-}
-else if(userInput.includes("disconnected")||userInput.includes("deattached")){
-  return "I'm sorry to hear that you're feeling disconnected. It's completely normal to feel this way sometimes, especially when life gets overwhelming. Remember to take some time for yourself and engage in activities that bring you joy and help you reconnect with yourself. Reach out to supportive friends or consider seeking professional help if you feel it would be beneficial. You're not alone, and there are people who care about you. Stay strong! 💪❤️"
-}
-
-else if(userInput.includes("Depressed")){
-  return "I'm really sorry to hear that you're feeling depressed. It's important to reach out to someone you trust, like a friend, family member, or even a mental health professional. They can provide support and guidance during this difficult time. Remember, you don't have to go through this alone. Take care of yourself and know that there is help available. 💙🌟 \nIts best if you learn it from experts."}
-
-// HAAPY mood
-
-else if(userInput.includes("happy")||userInput.includes("excited")){
-  return "That's wonderful to hear! I'm so glad you're feeling happy.  😄🌟"
-}
-
-else if(userInput.includes("bye")||userInput.includes("Good bye")){
-  return "Take care! If you ever need someone to talk to or have any questions, feel free to reach out. Goodbye!"
-}
-     else {
-      return "I'm here to help. Please feel free to ask any questions or share your concerns.";
     }
   }
-  
+
+  if (bestMatch) {
+    const replies = bestMatch.replies;
+    return replies[Math.floor(Math.random() * replies.length)];
+  }
+
+  // Default fallback
+  const fallbacks = [
+    "I'm here to listen. Could you tell me more about how you're feeling? 💙",
+    "I want to understand better. Could you share a bit more? 😊",
+    "I hear you. You can talk about stress, anxiety, relationships, studies, or anything else on your mind. I'm here for you! 🌟",
+    "Thank you for sharing. Try telling me about what's specifically bothering you — I can help with stress, mood, self-care, and more. 💛",
+  ];
+  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+
+function sendMessage(text) {
+  const messageText = text || userInput.value.trim();
+  if (!messageText) return;
+
+  addMessage(messageText, 'user');
+  userInput.value = '';
+
+  // Show typing indicator
+  showTyping();
+
+  // Simulate typing delay (600-1200ms)
+  const delay = 600 + Math.random() * 600;
+  setTimeout(() => {
+    hideTyping();
+    const response = generateResponse(messageText);
+    addMessage(response, 'bot');
+  }, delay);
+}
+
+// Event listeners
+sendBtn.addEventListener('click', () => sendMessage());
+
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// Quick reply chips
+document.querySelectorAll('.quick-reply').forEach(chip => {
+  chip.addEventListener('click', () => {
+    sendMessage(chip.dataset.msg);
+  });
+});
+
+// Welcome message on load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    addMessage("Hello! 👋 I'm your Revive wellness assistant. I'm here to listen and support you. You can talk to me about stress, anxiety, sleep, relationships, or anything on your mind. How are you feeling today?", 'bot');
+  }, 500);
+});
