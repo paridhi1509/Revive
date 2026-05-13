@@ -31,19 +31,19 @@ It's not a replacement for therapy or professional help — it's just a small th
 Nothing fancy:
 - HTML, CSS, JavaScript
 - No frameworks, no build tools, no npm packages needed
-- Just open `opening.html` in your browser and you're good to go
+- Just open `index.html` in your browser and you're good to go
 
 ## How to Run
 
 1. Clone the repo
-2. Open `opening.html` in any browser
+2. Open `index.html` in any browser
 3. That's it
 
 Or if you want to use a local server:
 ```
 npx http-server . -p 8080
 ```
-Then go to `http://localhost:8080/opening.html`
+Then go to `http://localhost:8080/index.html`
 
 ## Login
 
@@ -52,7 +52,7 @@ There are a few hardcoded accounts for demo purposes. You can also click **"Cont
 ## Project Structure
 
 ```
-├── opening.html       # Landing page
+├── index.html       # Landing page
 ├── LS1.html           # Login page
 ├── Menu1.html         # Dashboard with feature cards
 ├── moodttracker.html  # Mood tracker + journal
